@@ -12,14 +12,14 @@ class DeepFeatureExtractor(nn.Module):
         # input shape: (B, C, H, W)
         dpr = [x.item() for x in torch.linspace(0, drop_path_rate, sum(depths))]  # stochastic depth decay rule
 
-        self.res_swin_transformer_blocks = nn.Sequential(
+        res_swin_transformer_blocks = nn.Sequential(
             # k residual swin transformer blocks
             *[ResidualSwinTransformerBlock(num_layers=depths[idx],
                                            input_dim=input_dim,
-                                           heads=heads[idx],
+                                           heads=heads[idx] if isinstance(heads, list) else heads,
                                            head_dim=head_dim,
                                            window_size=window_size,
-                                           drop_path_probs=dpr[sum(depths[:idx]):sum(depths[:idx+1])],
+                                           drop_path_probs=dpr[sum(depths[:idx]):sum(depths[:idx + 1])],
                                            attn_drop_prob=attn_drop_prob,
                                            proj_drop_prob=proj_drop_prob)
               for idx in range(len(depths))],
@@ -33,7 +33,7 @@ class DeepFeatureExtractor(nn.Module):
                       padding=1)
             # (B, C, H, W)
         )
-        self.deep_feature_extractor = Residual(fn=self.combined, drop_path_prob=0)
+        self.deep_feature_extractor = Residual(fn=res_swin_transformer_blocks, drop_path_prob=0)
 
     def forward(self, x):
         # input shape: (B, C, H, W)

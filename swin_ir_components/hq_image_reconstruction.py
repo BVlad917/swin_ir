@@ -5,7 +5,7 @@ from torch import nn
 class HQImageReconstruction(nn.Module):
     def __init__(self, input_dim, scale, embed_dim):
         super().__init__()
-        assert (scale & (scale - 1)) != 0, "ERROR: Can only upscale in powers of 2 (2x, 4x, etc...)"
+        assert (scale & (scale - 1)) == 0, "ERROR: Can only upscale in powers of 2 (2x, 4x, etc...)"
         # convolutional layer before applying the up sample
         self.before_up_sample = nn.Sequential(
             nn.Conv2d(in_channels=input_dim,
@@ -18,7 +18,7 @@ class HQImageReconstruction(nn.Module):
 
         # up-sample: sequence of convolutional layers + pixel shuffle layers
         up_sample_layers = []
-        for _ in range(torch.log2(scale)):
+        for _ in range(int(torch.log2(torch.tensor(scale)))):
             up_sample_layers.append(nn.Conv2d(in_channels=embed_dim,
                                               out_channels=4 * embed_dim,
                                               kernel_size=3,

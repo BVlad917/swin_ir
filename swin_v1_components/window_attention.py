@@ -2,8 +2,8 @@ import torch
 from torch import nn
 from einops import rearrange
 
-from cyclic_shift import CyclicShift
-from utils import get_relative_distances, create_mask
+from swin_v1_components.cyclic_shift import CyclicShift
+from swin_v1_components.utils import get_relative_distances, create_mask
 
 
 class WindowAttention(nn.Module):

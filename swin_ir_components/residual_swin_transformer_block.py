@@ -31,8 +31,18 @@ class ResidualSwinTransformerBlock(nn.Module):
                               stride=1,
                               padding=1)
 
+        # custom weight initialization in the normalization layers
+        self._init_norms()
+
     def forward(self, x):
         # input shape: (B, C, H, W)
         x = self.swin_transformer_blocks(x)  # (B, C, H, W)
         x = self.conv(x)  # (B, C, H, W)
         return x
+
+    def _init_norms(self):
+        for block in self.swin_transformer_blocks:
+            nn.init.zeros_(block.norm1.norm.bias)
+            nn.init.zeros_(block.norm1.norm.weight)
+            nn.init.zeros_(block.norm2.norm.bias)
+            nn.init.zeros_(block.norm2.norm.weight)

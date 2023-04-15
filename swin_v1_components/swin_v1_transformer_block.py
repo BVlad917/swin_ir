@@ -1,9 +1,9 @@
 from torch import nn
 
-from mlp import MLP
-from pre_norm import PreNorm
-from residual import Residual
-from window_attention import WindowAttention
+from swin_v1_components.mlp import MLP
+from swin_v1_components.pre_norm import PreNorm
+from swin_v1_components.residual import Residual
+from swin_v1_components.window_attention import WindowAttention
 
 
 class SwinTransformerBlock(nn.Module):

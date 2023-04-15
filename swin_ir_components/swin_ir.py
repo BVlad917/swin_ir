@@ -1,3 +1,4 @@
+from timm.models.layers import trunc_normal_
 from torch import nn
 
 from swin_ir_components.deep_feature_extractor import DeepFeatureExtractor
@@ -22,6 +23,7 @@ class SwinIR(nn.Module):
         self.hq_image_reconstruction = HQImageReconstruction(input_dim=embed_dim,
                                                              scale=scale,
                                                              embed_dim=embed_dim)
+        self.apply(self._init_weights)
 
     def forward(self, x):
         # input shape: (B, 3, H, W)
@@ -29,3 +31,13 @@ class SwinIR(nn.Module):
         x = self.deep_feature_extractor(x)  # (B, EMBED_DIM, H, W)
         x = self.hq_image_reconstruction(x)  # (B, 3, H * SCALE, W * SCALE)
         return x
+
+    @staticmethod
+    def _init_weights(m):
+        if isinstance(m, nn.Linear):
+            trunc_normal_(m.weight, std=.02)
+            if m.bias is not None:
+                nn.init.zeros_(m.bias)
+        elif isinstance(m, nn.LayerNorm):
+            nn.init.zeros_(m.bias)
+            nn.init.ones_(m.weight)
